@@ -1,13 +1,28 @@
 # acllibgo
-Library to help with security
 
-Provides a method to scrub property values of the struct based on acl groups.
+Provides a method to scrub property values of a struct based on acl groups. Library uses reflection and caching whenever possible. Intended for low frequency calls to ensure security compliance. Avoid using in high call frequency such as logging or tight loops.
+- Good use cases: 
+    - Scrubbing before returning object model by API ( ~ 200/second )
+    - Scrubbing before persisting model to database ( ~ 200/second )
+- Bad use cases: 
+    - Scrubbing before writing to debug logs ( ~ 1000+/second )
 
-###Playground:
+### Performance
+
+Mid 2014 15" Macbook Pro i7 2.5GHz/16GB macOS 10.15
+``` 
+2020-05-31
+Benchmark_ScrubNilAcl-8      	32795670	        31.8 ns/op	      16 B/op	       1 allocs/op
+Benchmark_ScrubEmptyAcl-8    	  279805	      4166 ns/op	    1568 B/op	      37 allocs/op
+Benchmark_ScrubSingleAcl-8   	  282964	      4214 ns/op	    1568 B/op	      37 allocs/op
+Benchmark_ScrubMultiAcl-8    	  262330	      4485 ns/op	    1568 B/op	      37 allocs/op
+```
+
+### Playground:
 
 https://play.golang.org/p/lDkvau0Ot1P
 
-###Example:
+### Example:
 ```go
 
 package main
