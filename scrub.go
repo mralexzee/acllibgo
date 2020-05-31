@@ -1,3 +1,7 @@
+// Copyright 2020 Alexander Zherdev. All rights reserved.
+// Use of this source code is governed by a MIT-style
+// license that can be found in the LICENSE file.
+
 package acllibgo
 
 import (
@@ -76,6 +80,7 @@ func Scrub(item interface{}, acl []string) error {
 
 	// Identify which properties to clear
 	for i := 0; i < len(elemTypeInfo.Field); i++ {
+
 		itemFieldInfo := elemTypeInfo.Field[i]
 		hasDefaultValue := false
 		if len(itemFieldInfo.AclTags) > 0 {
@@ -101,10 +106,6 @@ func Scrub(item interface{}, acl []string) error {
 			switch itemFieldInfo.Kind {
 			case reflect.Ptr, reflect.Array, reflect.Slice, reflect.Map:
 				ev := elemValue.Field(i)
-				if !ev.IsValid() || !ev.CanSet() {
-					continue
-				}
-
 				Scrub(ev.Interface(), acl)
 			}
 		}

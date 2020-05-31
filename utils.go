@@ -1,11 +1,16 @@
+// Copyright 2020 Alexander Zherdev. All rights reserved.
+// Use of this source code is governed by a MIT-style
+// license that can be found in the LICENSE file.
+
 package acllibgo
 
 import "reflect"
 
 func setToDefault(f reflect.Value) {
-	if f.IsValid() || !f.CanSet() {
+	if !f.IsValid() || !f.CanSet() {
 		return
 	}
+
 	switch f.Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		f.SetInt(0)
