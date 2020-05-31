@@ -3,9 +3,15 @@ package acllibgo
 import (
 	"errors"
 	"reflect"
-	"strings"
 )
 
+// Scrub sets structure's fields to default value based on optional 'acl' field tag
+// Tag 'acl' on a field has the following effect on Scrub:
+//  - <not defined> : Field is not altered
+//  - acl:"" : Field is not altered
+//  - acl:"*" : Field is not altered as long as Scrub acl has some value
+//  - acl:admin : Field is not altered as long as Scrub acl has an array containing "admin" element
+//  - acl:admin,user : Field is not altered as long as Scrub acl has an array containing "admin" or "user" element
 func Scrub(item interface{}, acl []string) error {
 	if item == nil {
 		return errors.New("scrub: nil item")
@@ -24,7 +30,7 @@ func Scrub(item interface{}, acl []string) error {
 	case reflect.Slice, reflect.Array:
 		arrItemType := reflect.TypeOf(item).Elem()
 		if arrItemType.Kind() != reflect.Ptr {
-			return errors.New("scrub: expecting pointer for elements")
+			return errors.New("scrub: expecting pointer for slice or array elements")
 		}
 
 		for i := 0; i < itemValue.Len(); i++ {
@@ -36,7 +42,7 @@ func Scrub(item interface{}, acl []string) error {
 	case reflect.Map:
 		arrItemType := reflect.TypeOf(item).Elem()
 		if arrItemType.Kind() != reflect.Ptr {
-			return errors.New("scrub: expecting pointer for elements")
+			return errors.New("scrub: expecting pointer for map values")
 		}
 
 		for _, mKey := range itemValue.MapKeys() {
@@ -45,6 +51,7 @@ func Scrub(item interface{}, acl []string) error {
 				Scrub(mapValue.Interface(), acl)
 			}
 		}
+
 		return nil
 	case reflect.Ptr:
 		if itemValue.IsNil() {
@@ -60,65 +67,48 @@ func Scrub(item interface{}, acl []string) error {
 		return nil
 	}
 
-	typeOfV := elemValue.Type()
+	elemTypeInfo := getTypeInfo(elemValue.Type())
 
 	// Ensure we have a struct
-	if typeOfV.Kind() != reflect.Struct {
-		return errors.New("scrub: expecting struct, got " + typeOfV.String())
+	if elemTypeInfo.Kind != reflect.Struct {
+		return errors.New("scrub: expecting struct, got " + elemTypeInfo.ToStringValue)
 	}
 
 	// Identify which properties to clear
-	for i := 0; i < elemValue.NumField(); i++ {
-		itemField := typeOfV.Field(i)
-		ev := elemValue.Field(i)
-		if !ev.IsValid() || !ev.CanSet() {
-			continue
-		}
-
-		aclTag := strings.TrimSpace(itemField.Tag.Get("acl"))
-		if len(aclTag) > 0 {
+	for i := 0; i < len(elemTypeInfo.Field); i++ {
+		itemFieldInfo := elemTypeInfo.Field[i]
+		hasDefaultValue := false
+		if len(itemFieldInfo.AclTags) > 0 {
 			found := false
 
-			if aclTag == "*" || strings.Contains(aclTag, "*") {
-				found = true
-			} else {
-				aclTagArray := strings.Split(aclTag, ",")
-
-				for _, providedAcl := range acl {
-					for _, tagAcl := range aclTagArray {
-						if tagAcl == "" || tagAcl == "*" || tagAcl == providedAcl {
-							found = true
-						}
+			for _, providedAcl := range acl {
+				for _, tagAcl := range itemFieldInfo.AclTags {
+					if tagAcl == "*" || tagAcl == providedAcl {
+						found = true
 					}
 				}
 			}
 
 			if !found {
+				hasDefaultValue = true
+				ev := elemValue.Field(i)
 				setToDefault(ev)
 			}
 		}
 
-		Scrub(ev.Interface(), acl)
+		// scrub field if we have not set it to default and it's a supports type
+		if !hasDefaultValue {
+			switch itemFieldInfo.Kind {
+			case reflect.Ptr, reflect.Array, reflect.Slice, reflect.Map:
+				ev := elemValue.Field(i)
+				if !ev.IsValid() || !ev.CanSet() {
+					continue
+				}
+
+				Scrub(ev.Interface(), acl)
+			}
+		}
 	}
 
 	return nil
-}
-
-func setToDefault(f reflect.Value) {
-	switch f.Kind() {
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		f.SetInt(0)
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		f.SetUint(0)
-	case reflect.Float32, reflect.Float64:
-		f.SetFloat(0)
-	case reflect.Complex64, reflect.Complex128:
-		f.SetComplex(0)
-	case reflect.String:
-		f.SetString("")
-	case reflect.Bool:
-		f.SetBool(false)
-	case reflect.Ptr, reflect.Array, reflect.Map, reflect.Slice, reflect.Interface:
-		f.Set(reflect.Zero(f.Type()))
-	}
 }

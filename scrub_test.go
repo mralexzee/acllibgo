@@ -45,6 +45,33 @@ func TestStruct_Basic(t *testing.T) {
 	assert.Nil(t, testItem.Children[0].FullName)
 }
 
+func TestStruct_Basic2(t *testing.T) {
+
+	testItem := newPerson()
+
+	// Pass by value - not ok
+	err := Scrub(testItem, []string{})
+	assert.Error(t, err)
+
+	// Pass by reference - ok
+	err = Scrub(&testItem, []string{})
+	assert.NoError(t, err)
+
+	assert.NoError(t, err)
+	assert.Equal(t, int32(0), testItem.Height)
+	assert.NotNil(t, testItem.Father)
+	assert.NotNil(t, testItem.Children)
+	assert.Nil(t, testItem.FullName)
+	assert.Nil(t, testItem.Mother)
+	assert.Nil(t, testItem.FullName)
+
+	assert.True(t, len(testItem.Children) > 0)
+	assert.Equal(t, int32(0), testItem.Children[0].Height)
+	assert.Equal(t, int32(0), testItem.Children[1].Height)
+	assert.Nil(t, testItem.Children[0].FullName)
+	assert.Nil(t, testItem.Children[0].FullName)
+}
+
 func TestStruct_Slice(t *testing.T) {
 
 	one := newPerson()
