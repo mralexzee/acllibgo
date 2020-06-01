@@ -2,10 +2,10 @@
 
 Provides a method to scrub based on acl groups, zero, or keep property values of a struct. Library uses reflection and caching whenever possible. Intended for low frequency calls to ensure security compliance. Avoid using in high call frequency such as logging or tight loops.
 - Good use cases: 
-    - Scrubbing before returning object model by API ( ~ 200/second )
-    - Scrubbing before persisting model to database ( ~ 200/second )
+    - Scrubbing before returning object model by API
+    - Scrubbing before persisting model to database
 - Bad use cases: 
-    - Scrubbing before writing to debug logs ( ~ 1000+/second )
+    - Scrubbing all log structures before writing to debug logs
 
 ### Functions
 
@@ -19,10 +19,10 @@ Mid 2014 15" Macbook Pro i7 2.5GHz/16GB macOS 10.15
 ``` 
 2020-05-31
 
-Benchmark_ScrubSingleAcl-8   	  279992	      4101 ns/op	    1568 B/op	      37 allocs/op
-Benchmark_ScrubMultiAcl-8    	  267751	      4390 ns/op	    1568 B/op	      37 allocs/op
-Benchmark_Zero_Basic-8       	  235430	      4989 ns/op	    2000 B/op	      59 allocs/op
-
+Benchmark_Keep_Basic-8       	  463314	      2355 ns/op	     544 B/op	      18 allocs/op
+Benchmark_Scrub_SingleAcl-8   	  288770	      4086 ns/op	    1568 B/op	      37 allocs/op
+Benchmark_Scrub_MultiAcl-8    	  270132	      4365 ns/op	    1568 B/op	      37 allocs/op
+Benchmark_Zero_Basic-8        	  240237	      4983 ns/op	    2000 B/op	      59 allocs/op
 ```
 
 ### Playground:

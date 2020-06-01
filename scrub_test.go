@@ -211,28 +211,28 @@ func TestInvalidType_Map(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func Benchmark_ScrubNilAcl(b *testing.B) {
+func Benchmark_Scrub_NilAcl(b *testing.B) {
 	testItem := newPerson()
 	for n := 0; n < b.N; n++ {
 		Scrub(&testItem, nil)
 	}
 }
 
-func Benchmark_ScrubEmptyAcl(b *testing.B) {
+func Benchmark_Scrub_EmptyAcl(b *testing.B) {
 	testItem := newPerson()
 	for n := 0; n < b.N; n++ {
 		Scrub(&testItem, []string{})
 	}
 }
 
-func Benchmark_ScrubSingleAcl(b *testing.B) {
+func Benchmark_Scrub_SingleAcl(b *testing.B) {
 	testItem := newPerson()
 	for n := 0; n < b.N; n++ {
 		Scrub(&testItem, []string{"root"})
 	}
 }
 
-func Benchmark_ScrubMultiAcl(b *testing.B) {
+func Benchmark_Scrub_MultiAcl(b *testing.B) {
 	testItem := newPerson()
 	for n := 0; n < b.N; n++ {
 		Scrub(&testItem, []string{"access", "login"})
