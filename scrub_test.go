@@ -49,33 +49,6 @@ func TestStruct_Basic(t *testing.T) {
 	assert.Nil(t, testItem.Children[0].FullName)
 }
 
-func TestStruct_Basic2(t *testing.T) {
-
-	testItem := newPerson()
-
-	// Pass by value - not ok
-	err := Scrub(testItem, []string{})
-	assert.Error(t, err)
-
-	// Pass by reference - ok
-	err = Scrub(&testItem, []string{})
-	assert.NoError(t, err)
-
-	assert.NoError(t, err)
-	assert.Equal(t, int32(0), testItem.Height)
-	assert.NotNil(t, testItem.Father)
-	assert.NotNil(t, testItem.Children)
-	assert.Nil(t, testItem.FullName)
-	assert.Nil(t, testItem.Mother)
-	assert.Nil(t, testItem.FullName)
-
-	assert.True(t, len(testItem.Children) > 0)
-	assert.Equal(t, int32(0), testItem.Children[0].Height)
-	assert.Equal(t, int32(0), testItem.Children[1].Height)
-	assert.Nil(t, testItem.Children[0].FullName)
-	assert.Nil(t, testItem.Children[0].FullName)
-}
-
 func TestStruct_Slice(t *testing.T) {
 
 	one := newPerson()
@@ -236,4 +209,32 @@ func TestInvalidType_Map(t *testing.T) {
 	assert.Error(t, err)
 	err = Scrub(&testVar, []string{"owner"})
 	assert.Error(t, err)
+}
+
+func Benchmark_ScrubNilAcl(b *testing.B) {
+	testItem := newPerson()
+	for n := 0; n < b.N; n++ {
+		Scrub(&testItem, nil)
+	}
+}
+
+func Benchmark_ScrubEmptyAcl(b *testing.B) {
+	testItem := newPerson()
+	for n := 0; n < b.N; n++ {
+		Scrub(&testItem, []string{})
+	}
+}
+
+func Benchmark_ScrubSingleAcl(b *testing.B) {
+	testItem := newPerson()
+	for n := 0; n < b.N; n++ {
+		Scrub(&testItem, []string{"root"})
+	}
+}
+
+func Benchmark_ScrubMultiAcl(b *testing.B) {
+	testItem := newPerson()
+	for n := 0; n < b.N; n++ {
+		Scrub(&testItem, []string{"access", "login"})
+	}
 }
