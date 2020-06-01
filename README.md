@@ -1,21 +1,28 @@
 # acllibgo
 
-Provides a method to scrub property values of a struct based on acl groups. Library uses reflection and caching whenever possible. Intended for low frequency calls to ensure security compliance. Avoid using in high call frequency such as logging or tight loops.
+Provides a method to scrub based on acl groups, zero, or keep property values of a struct. Library uses reflection and caching whenever possible. Intended for low frequency calls to ensure security compliance. Avoid using in high call frequency such as logging or tight loops.
 - Good use cases: 
     - Scrubbing before returning object model by API ( ~ 200/second )
     - Scrubbing before persisting model to database ( ~ 200/second )
 - Bad use cases: 
     - Scrubbing before writing to debug logs ( ~ 1000+/second )
 
+### Functions
+
+- Scrub(item, groups) -> zero out fields based on struct fields tag "acl" and provided groups
+- Keep(item, fields) -> keep only the fields define in fields array, other fields get zero'd out
+- Zero(item, fields) -> zero out all specified fields, leave others alone
+
 ### Performance
 
 Mid 2014 15" Macbook Pro i7 2.5GHz/16GB macOS 10.15
 ``` 
 2020-05-31
-Benchmark_ScrubNilAcl-8      	32795670	        31.8 ns/op	      16 B/op	       1 allocs/op
-Benchmark_ScrubEmptyAcl-8    	  279805	      4166 ns/op	    1568 B/op	      37 allocs/op
-Benchmark_ScrubSingleAcl-8   	  282964	      4214 ns/op	    1568 B/op	      37 allocs/op
-Benchmark_ScrubMultiAcl-8    	  262330	      4485 ns/op	    1568 B/op	      37 allocs/op
+
+Benchmark_ScrubSingleAcl-8   	  279992	      4101 ns/op	    1568 B/op	      37 allocs/op
+Benchmark_ScrubMultiAcl-8    	  267751	      4390 ns/op	    1568 B/op	      37 allocs/op
+Benchmark_Zero_Basic-8       	  235430	      4989 ns/op	    2000 B/op	      59 allocs/op
+
 ```
 
 ### Playground:
