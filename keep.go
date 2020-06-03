@@ -10,8 +10,8 @@ import (
 )
 
 type StructField struct {
-	Name   string
-	Fields []StructField
+	Name   string        `json:"name,omitempty"`
+	Fields []StructField `json:"fields,omitempty"`
 }
 
 // Keep retains the value of the properties provided, other properties are set to defaults

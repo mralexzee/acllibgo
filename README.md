@@ -12,17 +12,22 @@ Provides a method to scrub based on acl groups, zero, or keep property values of
 - Scrub(item, groups) -> zero out fields based on struct fields tag "acl" and provided groups
 - Keep(item, fields) -> keep only the fields define in fields array, other fields get zero'd out
 - Zero(item, fields) -> zero out all specified fields, leave others alone
+- Parse(text) -> parses string to StructField array to pass into Keep and Zero
 
 ### Performance
 
 Mid 2014 15" Macbook Pro i7 2.5GHz/16GB macOS 10.15
 ``` 
-2020-05-31
+2020-06-02
 
-Benchmark_Keep_Basic-8       	  463314	      2355 ns/op	     544 B/op	      18 allocs/op
-Benchmark_Scrub_SingleAcl-8   	  288770	      4086 ns/op	    1568 B/op	      37 allocs/op
-Benchmark_Scrub_MultiAcl-8    	  270132	      4365 ns/op	    1568 B/op	      37 allocs/op
-Benchmark_Zero_Basic-8        	  240237	      4983 ns/op	    2000 B/op	      59 allocs/op
+Benchmark_Keep_Basic-8        	  465370	      2317 ns/op	     544 B/op	      18 allocs/op
+Benchmark_ParseComplex-8      	  352665	      3202 ns/op	    1640 B/op	      50 allocs/op
+Benchmark_ParseSimple-8       	 1409509	       851 ns/op	     448 B/op	      13 allocs/op
+Benchmark_Scrub_NilAcl-8      	37911655	        32 ns/op	      16 B/op	       1 allocs/op
+Benchmark_Scrub_EmptyAcl-8    	  285002	      4111 ns/op	    1568 B/op	      37 allocs/op
+Benchmark_Scrub_SingleAcl-8   	  286686	      4131 ns/op	    1568 B/op	      37 allocs/op
+Benchmark_Scrub_MultiAcl-8    	  264146	      4513 ns/op	    1568 B/op	      37 allocs/op
+Benchmark_Zero_Basic-8        	  235779	      5025 ns/op	    2000 B/op	      59 allocs/op
 ```
 
 ### Playground:

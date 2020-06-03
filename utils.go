@@ -4,7 +4,10 @@
 
 package acllibgo
 
-import "reflect"
+import (
+	"encoding/json"
+	"reflect"
+)
 
 func setToDefault(f reflect.Value) {
 	if !f.IsValid() || !f.CanSet() {
@@ -27,4 +30,9 @@ func setToDefault(f reflect.Value) {
 	case reflect.Ptr, reflect.Array, reflect.Map, reflect.Slice, reflect.Interface:
 		f.Set(reflect.Zero(f.Type()))
 	}
+}
+
+func toJson(i interface{}) string {
+	j, _ := json.Marshal(i)
+	return string(j)
 }
