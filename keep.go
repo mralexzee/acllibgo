@@ -7,6 +7,7 @@ package acllibgo
 import (
 	"errors"
 	"reflect"
+	"strings"
 )
 
 type StructField struct {
@@ -85,7 +86,7 @@ func Keep(item interface{}, fields []StructField) error {
 		found := false
 		fieldFields := []StructField{}
 		for _, k := range fields {
-			if k.Name == itemFieldInfo.Name || k.Name == "*" {
+			if strings.EqualFold(k.Name, itemFieldInfo.Name) || k.Name == "*" {
 				found = true
 				fieldFields = k.Fields
 				break

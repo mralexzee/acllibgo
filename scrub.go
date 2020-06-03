@@ -7,6 +7,7 @@ package acllibgo
 import (
 	"errors"
 	"reflect"
+	"strings"
 )
 
 // Scrub sets structure's fields to default value based on optional 'acl' field tag
@@ -88,7 +89,7 @@ func Scrub(item interface{}, acl []string) error {
 
 			for _, providedAcl := range acl {
 				for _, tagAcl := range itemFieldInfo.AclTags {
-					if tagAcl == "*" || tagAcl == providedAcl {
+					if tagAcl == "*" || strings.EqualFold(tagAcl, providedAcl) {
 						found = true
 					}
 				}

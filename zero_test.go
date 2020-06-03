@@ -21,8 +21,8 @@ func Test_Zero_Basic(t *testing.T) {
 	// Pass by reference - ok
 	err = Zero(&testItem, []StructField{
 		{Name: "Age"},
-		{Name: "Nickname"},
-		{Name: "Children", Fields: []StructField{{Name: "Age"}}},
+		{Name: "NickNAME"},
+		{Name: "Children", Fields: []StructField{{Name: "AGE"}}},
 		{Name: "Mother"},
 		{Name: "Friends", Fields: []StructField{{Name: "*"}}},
 	})
@@ -33,6 +33,7 @@ func Test_Zero_Basic(t *testing.T) {
 	assert.NotNil(t, testItem.Father)
 
 	assert.True(t, testItem.Age == 0)
+	assert.True(t, len(testItem.Nickname) == 0)
 	assert.Nil(t, testItem.Mother)
 	assert.Nil(t, testItem.Friends)
 

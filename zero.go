@@ -7,6 +7,7 @@ package acllibgo
 import (
 	"errors"
 	"reflect"
+	"strings"
 )
 
 // Zero clears the value of the properties provided, other properties are untouched
@@ -79,7 +80,7 @@ func Zero(item interface{}, fields []StructField) error {
 		remove := false
 		fieldFields := []StructField{}
 		for _, k := range fields {
-			if k.Name == itemFieldInfo.Name || k.Name == "*" {
+			if strings.EqualFold(k.Name, itemFieldInfo.Name) || k.Name == "*" {
 				fieldFields = k.Fields
 
 				if len(k.Fields) == 0 || k.Fields[0].Name == "*" {

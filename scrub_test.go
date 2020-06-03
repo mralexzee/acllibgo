@@ -49,6 +49,26 @@ func TestStruct_Basic(t *testing.T) {
 	assert.Nil(t, testItem.Children[0].FullName)
 }
 
+func Test_Scrub_AsTester(t *testing.T) {
+
+	testItem := newPerson()
+
+	// Pass by value - not ok
+	err := Scrub(testItem, []string{})
+	assert.Error(t, err)
+
+	// Pass by reference - ok
+	err = Scrub(&testItem, []string{"TEster"})
+	assert.NoError(t, err)
+
+	assert.NoError(t, err)
+	assert.True(t, testItem.Height > 0)
+	assert.Nil(t, testItem.Groups)
+	assert.NotNil(t, testItem.Mother)
+	assert.NotNil(t, testItem.FullName)
+	assert.True(t, len(testItem.Children) > 0)
+}
+
 func TestStruct_Slice(t *testing.T) {
 
 	one := newPerson()
@@ -133,7 +153,7 @@ func newPerson() Person {
 type Person struct {
 	Age       int                `json:"age,omitempty"`
 	Height    int32              `json:"height,omitempty" acl:"tester"`
-	Groups    map[string]bool    `json:"groups,omitempty"  acl:"tester"`
+	Groups    map[string]bool    `json:"groups,omitempty"  acl:"admin"`
 	FullName  []string           `json:"fullName,omitempty" acl:"tester"`
 	Nickname  string             `json:"nickname,omitempty" acl:"*"`
 	Mother    *Person            `json:"mother,omitempty" acl:"tester"`
